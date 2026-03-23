@@ -1,9 +1,9 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.http import JsonResponse ,HttpResponse
 from app.models import Student as stu
 from app.serializers import Stu_serializer 
 from rest_framework.renderers import JSONRenderer
-from rest_framework.response import Response
+# from rest_framework.response import Response
 import io
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
@@ -12,14 +12,14 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def student(req):
     if req.method == 'POST':
-        data = req.body
-        strame = io.BytesIO(data)
-        p_data= JSONParser().parse(strame)
-        serializer=Stu_serializer(data=p_data)
+        data = req.body      # data ko bytes format me change kiya h
+        strame = io.BytesIO(data)   #json parse bytes format ko nhi samjh pata h isliye data ko strame format me change kr rahe h 
+        p_data= JSONParser().parse(strame) 
+        serializer=Stu_serializer(data=p_data)  
         if serializer.is_valid():
             serializer.save()
             print({'msg': 'object created'})
-            return HttpResponse({'msg':'object created'},content_type='application/json')
+            return JsonResponse({'msg':'object created'},content_type='application/json')
            
         else:
             data=JSONRenderer().render(serializer.errors)
